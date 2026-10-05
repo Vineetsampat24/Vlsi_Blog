@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+        content="Static Analysis of a CMOS Inverter: Understanding Its Voltage Transfer Characteristics">
+
+    <meta name="keywords"
+        content="VLSI, CMOS Inverter, Voltage Transfer Characteristics, VTC, Static Analysis, MOSFET">
+
+    <meta name="author" content="VLSI Blog">
+
+    <title>Static Analysis of a CMOS Inverter | VLSI</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <header class="navbar">
+        <div class="nav-container">
+
+            <a href="#home" class="logo">
+                <span class="logo-icon">◈</span>
+                VLSI <span>LAB</span>
+            </a>
+
+            <nav>
+                <a href="#introduction">Introduction</a>
+                <a href="#cmos">CMOS Inverter</a>
+                <a href="#analysis">Analysis</a>
+                <a href="#vtc">VTC</a>
+                <a href="#conclusion">Conclusion</a>
+            </nav>
+
+            <a href="#author" class="nav-button">VLSI BLOG</a>
+
+        </div>
+    </header>
+
+
+    <!-- ================= HERO ================= -->
+
+    <main>
+
+        <section class="hero" id="home">
+
+            <div class="hero-grid">
+
+                <div class="hero-content">
+
+                    <div class="tag">
+                        <span></span>
+                        VLSI • CMOS • DIGITAL CIRCUITS
+                    </div>
+
+                    <h1>
+                        Static Analysis of a
+                        <span>CMOS Inverter</span>
+                    </h1>
+
+                    <p class="hero-subtitle">
+                        Understanding Its Voltage Transfer Characteristics
+                    </p>
+
+                    <p class="hero-description">
+                        Explore how a CMOS inverter responds to different input
+                        voltages, how the PMOS and NMOS transistors operate, and
+                        why the Voltage Transfer Characteristic is fundamental
+                        to digital VLSI design.
+                    </p>
+
+                    <div class="hero-buttons">
+                        <a href="#introduction" class="primary-btn">
+                            Start Reading →
+                        </a>
+
+                        <a href="#vtc" class="secondary-btn">
+                            View VTC
+                        </a>
+                    </div>
+
+                </div>
+
+
+                <!-- HERO CIRCUIT -->
+
+                <div class="hero-circuit">
+
+                    <div class="circuit-glow"></div>
+
+                    <svg viewBox="0 0 500 400"
+                         xmlns="http://www.w3.org/2000/svg">
+
+                        <!-- Supply -->
+                        <text x="250" y="30"
+                              text-anchor="middle"
+                              class="svg-label">
+                            VDD
+                        </text>
+
+                        <line x1="250" y1="45"
+                              x2="250" y2="80"
+                              class="wire"/>
+
+                        <!-- PMOS -->
+                        <rect x="210" y="80"
+                              width="80"
+                              height="70"
+                              rx="8"
+                              class="transistor"/>
+
+                        <text x="250" y="120"
+                              text-anchor="middle"
+                              class="transistor-text">
+                            PMOS
+                        </text>
+
+                        <!-- Middle wire -->
+                        <line x1="250" y1="150"
+                              x2="250" y2="190"
+                              class="wire"/>
+
+                        <!-- Output -->
+                        <circle cx="250"
+                                cy="200"
+                                r="7"
+                                class="node"/>
+
+                        <text x="275" y="205"
+                              class="svg-label">
+                            VOUT
+                        </text>
+
+                        <!-- NMOS -->
+                        <line x1="250" y1="207"
+                              x2="250" y2="230"
+                              class="wire"/>
+
+                        <rect x="210" y="230"
+                              width="80"
+                              height="70"
+                              rx="8"
+                              class="transistor"/>
+
+                        <text x="250" y="270"
+                              text-anchor="middle"
+                              class="transistor-text">
+                            NMOS
+                        </text>
+
+                        <!-- Ground -->
+                        <line x1="250" y1="300"
+                              x2="250" y2="325"
+                              class="wire"/>
+
+                        <line x1="220" y1="325"
+                              x2="280" y2="325"
+                              class="ground"/>
+
+                        <line x1="230" y1="335"
+                              x2="270" y2="335"
+                              class="ground"/>
+
+                        <line x1="240" y1="345"
+                              x2="260" y2="345"
+                              class="ground"/>
+
+                        <!-- Input -->
+                        <line x1="90" y1="190"
+                              x2="210" y2="190"
+                              class="input-wire"/>
+
+                        <circle cx="90"
+                                cy="190"
+                                r="7"
+                                class="node"/>
+
+                        <text x="80" y="175"
+                              text-anchor="middle"
+                              class="svg-label">
+                            VIN
+                        </text>
+
+                        <!-- PMOS gate -->
+                        <line x1="200" y1="90"
+                              x2="200" y2="140"
+                              class="gate-line"/>
+
+                        <line x1="90" y1="190"
+                              x2="200" y2="190"
+                              class="input-wire"/>
+
+                        <line x1="200" y1="115"
+                              x2="210" y2="115"
+                              class="input-wire"/>
+
+                        <!-- NMOS gate -->
+                        <line x1="200" y1="240"
+                              x2="200" y2="290"
+                              class="gate-line"/>
+
+                        <line x1="200" y1="265"
+                              x2="210" y2="265"
+                              class="input-wire"/>
+
+                    </svg>
+
+                </div>
+
+            </div>
+
+            <div class="scroll-indicator">
+                SCROLL TO EXPLORE
+                <span>↓</span>
+            </div>
+
+        </section>
+
+
+        <!-- ================= ARTICLE ================= -->
+
+        <article class="article">
+
+            <!-- INTRODUCTION -->
+
+            <section id="introduction" class="section">
+
+                <div class="section-number">01</div>
+
+                <div class="section-content">
+
+                    <div class="section-heading">
+                        <span>FOUNDATION</span>
+                        <h2>Introduction</h2>
+                    </div>
+
+                    <p>
+                        The CMOS inverter is one of the most fundamental building
+                        blocks in modern digital integrated circuits. It consists
+                        of two complementary MOSFETs: a PMOS transistor connected
+                        to the positive supply voltage and an NMOS transistor
+                        connected to ground. The two devices work together to
+                        produce an output that is the logical complement of the
+                        input.
+                    </p>
+
+                    <p>
+                        Although the CMOS inverter appears simple, its electrical
+                        behaviour provides important insights into digital circuit
+                        design. Static analysis allows us to understand the
+                        relationship between the input voltage and output voltage,
+                        determine transistor operating regions, estimate noise
+                        margins, and identify the switching behaviour of the
+                        circuit.
+                    </p>
+
+                    <div class="highlight-box">
+                        <div class="highlight-icon">⚡</div>
+
+                        <div>
+                            <strong>Key Idea</strong>
+                            <p>
+                                A CMOS inverter converts a LOW input into a HIGH
+                                output and a HIGH input into a LOW output while
+                                ideally consuming almost no static power.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- BASIC STRUCTURE -->
+
+            <section id="cmos" class="section">
+
+                <div class="section-number">02</div>
+
+                <div class="section-content">
+
+                    <div class="section-heading">
+                        <span>CIRCUIT STRUCTURE</span>
+                        <h2>CMOS Inverter</h2>
+                    </div>
+
+                    <p>
+                        A CMOS inverter uses complementary transistors. The PMOS
+                        transistor forms the pull-up network while the NMOS
+                        transistor forms the pull-down network. Their gates are
+                        connected together and act as the input terminal.
+                    </p>
+
+                    <div class="circuit-card">
+
+                        <div class="circuit-title">
+                            <span>CMOS INVERTER</span>
+                            <small>Complementary MOS Logic</small>
+                        </div>
+
+                        <svg viewBox="0 0 700 420"
+                             xmlns="http://www.w3.org/2000/svg"
+                             class="main-circuit">
+
+                            <!-- VDD -->
+                            <text x="350" y="25"
+                                  text-anchor="middle"
+                                  class="diagram-text">
+                                VDD
+                            </text>
+
+                            <line x1="350" y1="40"
+                                  x2="350" y2="75"
+                                  class="diagram-wire"/>
+
+                            <!-- PMOS -->
+                            <rect x="300" y="75"
+                                  width="100"
+                                  height="85"
+                                  rx="10"
+                                  class="diagram-transistor"/>
+
+                            <text x="350" y="125"
+                                  text-anchor="middle"
+                                  class="diagram-text">
+                                PMOS
+                            </text>
+
+                            <!-- Output wire -->
+                            <line x1="350" y1="160"
+                                  x2="350" y2="210"
+                                  class="diagram-wire"/>
+
+                            <circle cx="350"
+                                    cy="210"
+                                    r="8"
+                                    class="diagram-node"/>
+
+                            <text x="380" y="215"
+                                  class="diagram-text">
+                                VOUT
+                            </text>
+
+                            <!-- NMOS -->
+                            <line x1="350" y1="218"
+                                  x2="350" y2="245"
+                                  class="diagram-wire"/>
+
+                            <rect x="300" y="245"
+                                  width="100"
+                                  height="85"
+                                  rx="10"
+                                  class="diagram-transistor"/>
+
+                            <text x="350" y="295"
+                                  text-anchor="middle"
+                                  class="diagram-text">
+                                NMOS
+                            </text>
+
+                            <!-- Ground -->
+                            <line x1="350" y1="330"
+                                  x2="350" y2="355"
+                                  class="diagram-wire"/>
+
+                            <line x1="315" y1="355"
+                                  x2="385" y2="355"
+                                  class="ground-line"/>
+
+                            <line x1="325" y1="365"
+                                  x2="375" y2="365"
+                                  class="ground-line"/>
+
+                            <line x1="338" y1="375"
+                                  x2="362" y2="375"
+                                  class="ground-line"/>
+
+                            <!-- Input -->
+                            <line x1="100" y1="210"
+                                  x2="300" y2="210"
+                                  class="input-line"/>
+
+                            <circle cx="100"
+                                    cy="210"
+                                    r="8"
+                                    class="diagram-node"/>
+
+                            <text x="100" y="190"
+                                  text-anchor="middle"
+                                  class="diagram-text">
+                                VIN
+                            </text>
+
+                            <!-- Gate connection -->
+                            <line x1="285" y1="90"
+                                  x2="285" y2="150"
+                                  class="gate"/>
+
+                            <line x1="285" y1="120"
+                                  x2="300" y2="120"
+                                  class="gate"/>
+
+                            <line x1="285" y1="260"
+                                  x2="285" y2="320"
+                                  class="gate"/>
+
+                            <line x1="285" y1="290"
+                                  x2="300" y2="290"
+                                  class="gate"/>
+
+                        </svg>
+
+                    </div>
+
+
+                    <div class="info-grid">
+
+                        <div class="info-card">
+                            <div class="card-icon">↑</div>
+                            <h3>PMOS</h3>
+                            <p>
+                                Pulls the output toward VDD when the input is
+                                LOW, producing a logic HIGH.
+                            </p>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="card-icon">↓</div>
+                            <h3>NMOS</h3>
+                            <p>
+                                Pulls the output toward ground when the input
+                                is HIGH, producing a logic LOW.
+                            </p>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="card-icon">⇄</div>
+                            <h3>Complementary Action</h3>
+                            <p>
+                                Ideally, one transistor is OFF while the other
+                                is ON during the stable logic states.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- STATIC OPERATION -->
+
+            <section id="analysis" class="section">
+
+                <div class="section-number">03</div>
+
+                <div class="section-content">
+
+                    <div class="section-heading">
+                        <span>STATIC ANALYSIS</span>
+                        <h2>Operating Regions</h2>
+                    </div>
+
+                    <p>
+                        Static analysis examines the CMOS inverter at different
+                        DC input voltages. As the input voltage increases from
+                        zero to the supply voltage, the NMOS and PMOS devices
+                        gradually change their operating regions. The output
+                        voltage therefore follows a characteristic transition
+                        from HIGH to LOW.
+                    </p>
+
+                    <div class="operation-table">
+
+                        <div class="table-row table-header">
+                            <div>VIN</div>
+                            <div>NMOS</div>
+                            <div>PMOS</div>
+                            <div>VOUT</div>
+                        </div>
+
+                        <div class="table-row">
+                            <div>0 V</div>
+                            <div class="OFF</div>
+                            <div class="ON</div>
+                            <div>≈ VDD</div>
+                        </div>
+
+                        <div class="table-row">
+                            <div>Low</div>
+                            <div>OFF / Weak</div>
+                            <div>ON</div>
+                            <div>HIGH</div>
+                        </div>
+
+                        <div class="table-row">
+                            <div>Transition</div>
+                            <div>ON</div>
+                            <div>ON</div>
+                            <div>Changes rapidly</div>
+                        </div>
+
+                        <div class="table-row">
+                            <div>High</div>
+                            <div>ON</div>
+                            <div>OFF / Weak</div>
+                            <div>LOW</div>
+                        </div>
+
+                        <div class="table-row">
+                            <div>VDD</div>
+                            <div>ON</div>
+                            <div>OFF</div>
+                            <div>≈ 0 V</div>
+                        </div>
+
+                    </div>
+
+
+                    <h3 class="subheading">
+                        Region 1 — Input is LOW
+                    </h3>
+
+                    <p>
+                        When the input voltage is close to 0 V, the NMOS
+                        transistor is turned OFF because its gate-to-source
+                        voltage is below the threshold voltage. At the same
+                        time, the PMOS transistor is turned ON. It connects the
+                        output node to VDD, making the output voltage
+                        approximately equal to the supply voltage.
+                    </p>
+
+
+                    <h3 class="subheading">
+                        Region 2 — Transition Region
+                    </h3>
+
+                    <p>
+                        As VIN increases, the NMOS transistor begins conducting
+                        while the PMOS transistor continues to conduct. Both
+                        transistors may be ON simultaneously. The output voltage
+                        starts decreasing rapidly. This region determines the
+                        switching characteristics and is particularly important
+                        when analysing the voltage transfer characteristic.
+                    </p>
+
+
+                    <h3 class="subheading">
+                        Region 3 — Input is HIGH
+                    </h3>
+
+                    <p>
+                        When VIN approaches VDD, the NMOS transistor is strongly
+                        ON and provides a low-resistance path to ground. The PMOS
+                        transistor becomes OFF. Consequently, the output voltage
+                        approaches 0 V, representing a logic LOW.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- VTC -->
+
+            <section id="vtc" class="section">
+
+                <div class="section-number">04</div>
+
+                <div class="section-content">
+
+                    <div class="section-heading">
+                        <span>CORE CONCEPT</span>
+                        <h2>Voltage Transfer Characteristic</h2>
+                    </div>
+
+                    <p>
+                        The Voltage Transfer Characteristic, commonly called the
+                        VTC, is a graph of output voltage VOUT versus input
+                        voltage VIN. It provides a visual representation of how
+                        the CMOS inverter transforms an input signal into its
+                        complementary output.
+                    </p>
+
+                    <div class="graph-card">
+
+                        <div class="graph-header">
+                            <div>
+                                <span>VTC ANALYSIS</span>
+                                <h3>VOUT vs VIN</h3>
+                            </div>
+
+                            <div class="graph-badge">
+                                CMOS INVERTER
+                            </div>
+                        </div>
+
+                        <div class="vtc-graph">
+
+                            <svg viewBox="0 0 760 460"
+                                 xmlns="http://www.w3.org/2000/svg">
+
+                                <!-- Grid -->
+                                <line x1="100" y1="70"
+                                      x2="100" y2="380"
+                                      class="axis"/>
+
+                                <line x1="100" y1="380"
+                                      x2="700" y2="380"
+                                      class="axis"/>
+
+                                <line x1="100" y1="150"
+                                      x2="700" y2="150"
+                                      class="grid-line"/>
+
+                                <line x1="100" y1="230"
+                                      x2="700" y2="230"
+                                      class="grid-line"/>
+
+                                <line x1="100" y1="300"
+                                      x2="700" y2="300"
+                                      class="grid-line"/>
+
+                                <line x1="250" y1="70"
+                                      x2="250" y2="380"
+                                      class="grid-line"/>
+
+                                <line x1="400" y1="70"
+                                      x2="400" y2="380"
+                                      class="grid-line"/>
+
+                                <line x1="550" y1="70"
+                                      x2="550" y2="380"
+                                      class="grid-line"/>
+
+                                <!-- VTC Curve -->
+                                <path
+                                    d="M 105 80
+                                       C 220 80, 270 82, 315 90
+                                       C 350 97, 370 120, 390 180
+                                       C 400 220, 410 260, 435 300
+                                       C 465 345, 520 365, 690 375"
+                                    class="vtc-curve"/>
+
+                                <!-- Switching point -->
+                                <circle cx="400"
+                                        cy="230"
+                                        r="9"
+                                        class="switch-point"/>
+
+                                <line x1="400"
+                                      y1="230"
+                                      x2="400"
+                                      y2="380"
+                                      class="switch-line"/>
+
+                                <!-- Labels -->
+                                <text x="400"
+                                      y="425"
+                                      text-anchor="middle"
+                                      class="graph-label">
+                                    VIN
+                                </text>
+
+                                <text x="35"
+                                      y="230"
+                                      transform="rotate(-90 35 230)"
+                                      text-anchor="middle"
+                                      class="graph-label">
+                                    VOUT
+                                </text>
+
+                                <text x="105"
+                                      y="65"
+                                      class="graph-value">
+                                    VOH ≈ VDD
+                                </text>
+
+                                <text x="610"
+                                      y="365"
+                                      class="graph-value">
+                                    VOL ≈ 0
+                                </text>
+
+                                <text x="410"
+                                      y="215"
+                                      class="graph-value">
+                                    VM
+                                </text>
+
+                                <text x="385"
+                                      y="395"
+                                      class="graph-value">
+                                    Switching Point
+                                </text>
+
+                            </svg>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="formula-card">
+
+                        <div class="formula-title">
+                            IMPORTANT PARAMETERS
+                        </div>
+
+                        <div class="formula-grid">
+
+                            <div>
+                                <span>Logic HIGH</span>
+                                <strong>VOH ≈ VDD</strong>
+                            </div>
+
+                            <div>
+                                <span>Logic LOW</span>
+                                <strong>VOL ≈ 0 V</strong>
+                            </div>
+
+                            <div>
+                                <span>Switching Voltage</span>
+                                <strong>VM</strong>
+                            </div>
+
+                            <div>
+                                <span>Voltage Gain</span>
+                                <strong>|dVOUT/dVIN|</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- NOISE MARGIN -->
+
+            <section class="section">
+
+                <div class="section-number">05</div>
+
+                <div class="section-content">
+
+                    <div class="section-heading">
+                        <span>DIGITAL RELIABILITY</span>
+                        <h2>Noise Margins</h2>
+                    </div>
+
+                    <p>
+                        The VTC is also useful for understanding the noise
+                        tolerance of a CMOS inverter. Noise margins indicate how
+                        much unwanted voltage disturbance can be tolerated while
+                        still correctly interpreting a signal as a logic HIGH or
+                        LOW.
+                    </p>
+
+                    <div class="noise-grid">
+
+                        <div class="noise-card">
+                            <span>NMH</span>
+                            <h3>High Noise Margin</h3>
+                            <p>
+                                Represents the maximum noise voltage that can be
+                                added to a HIGH-level signal without causing an
+                                incorrect logic interpretation.
+                            </p>
+                        </div>
+
+                        <div class="noise-card">
+                            <span>NML</span>
+                            <h3>Low Noise Margin</h3>
+                            <p>
+                                Represents the amount of noise that can be added
+                                to a LOW-level signal while maintaining reliable
+                                logic operation.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ADVANTAGES -->
+
+            <section class="section">
+
+                <div class="section-number">06</div>
+
+                <div class="section-content">
+
+                    <div class="section-heading">
+                        <span>WHY CMOS?</span>
+                        <h2>Advantages of CMOS Inverter</h2>
+                    </div>
+
+                    <div class="advantages">
+
+                        <div class="advantage">
+                            <span>01</span>
+                            <div>
+                                <h3>Low Static Power</h3>
+                                <p>
+                                    Ideally, there is no direct DC path from VDD
+                                    to ground in the stable logic states.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="advantage">
+                            <span>02</span>
+                            <div>
+                                <h3>High Noise Immunity</h3>
+                                <p>
+                                    CMOS circuits provide good noise margins,
+                                    making them reliable for digital systems.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="advantage">
+                            <span>03</span>
+                            <div>
+                                <h3>High Packing Density</h3>
+                                <p>
+                                    CMOS technology enables a huge number of
+                                    transistors to be integrated on a single chip.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="advantage">
+                            <span>04</span>
+                            <div>
+                                <h3>Rail-to-Rail Output</h3>
+                                <p>
+                                    The output can approach both supply rails,
+                                    giving strong logic HIGH and LOW levels.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- CONCLUSION -->
+
+            <section id="conclusion" class="conclusion">
+
+                <div class="conclusion-content">
+
+                    <div class="tag">
+                        <span></span>
+                        FINAL TAKEAWAY
+                    </div>
+
+                    <h2>
+                        The inverter is simple.
+                        <span>The analysis is powerful.</span>
+                    </h2>
+
+                    <p>
+                        Static analysis of a CMOS inverter provides the foundation
+                        for understanding much more complex digital VLSI circuits.
+                        By studying the relationship between VIN and VOUT, we can
+                        determine transistor operating regions, switching voltage,
+                        voltage gain, and noise margins.
+                    </p>
+
+                    <p>
+                        The Voltage Transfer Characteristic therefore acts as a
+                        powerful tool for evaluating the performance and reliability
+                        of CMOS logic. From a basic inverter to processors containing
+                        billions of transistors, the principles observed here remain
+                        fundamental to modern VLSI design.
+                    </p>
+
+                    <div class="conclusion-line"></div>
+
+                    <div class="end-note">
+                        CMOS → DIGITAL LOGIC → VLSI → MODERN COMPUTING
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- AUTHOR -->
+
+            <section class="author-section" id="author">
+
+                <div class="author-card">
+
+                    <div class="author-avatar">
+                        V
+                    </div>
+
+                    <div>
+                        <span class="author-label">TECHNICAL BLOG</span>
+
+                        <h3>Static Analysis of a CMOS Inverter</h3>
+
+                        <p>
+                            A concise exploration of CMOS inverter operation,
+                            static characteristics and Voltage Transfer
+                            Characteristics in VLSI design.
+                        </p>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </article>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-container">
+
+            <div class="footer-logo">
+                <span>◈</span> VLSILAB
+            </div>
+
+            <p>
+                Exploring VLSI • CMOS • Semiconductor Design
+            </p>
+
+            <div class="footer-line"></div>
+
+            <p class="copyright">
+                © 2026 VLSI Technical Blog. Built with HTML & CSS.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= BACK TO TOP ================= -->
+
+    <a href="#home" class="back-top">↑</a>
+
+</body>
+</html>
